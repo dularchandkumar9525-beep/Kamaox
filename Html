@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KAMAOX - Play Games & Earn Cash</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background: #080413; color: white; display: flex; justify-content: center; min-height: 100vh; }
+        .app-container { width: 100%; max-width: 480px; background: #0b061c; min-height: 100vh; padding-bottom: 75px; position: relative; }
+
+        /* Header */
+        header { padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; background: #0b061c; position: sticky; top:0; z-index:20; }
+        .header-left { display: flex; align-items: center; gap: 10px; }
+        .back-btn { font-size: 20px; cursor: pointer; display: none; }
+        .menu-btn { font-size: 20px; cursor: pointer; }
+        .logo { font-size: 20px; font-weight: 800; } .logo span { color: #8b5cf6; }
+        .coin-badge { background: #ffffff; color: #000; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 13px; display: flex; align-items: center; gap: 4px; box-shadow: 0 2px 6px rgba(0,0,0,0.3); }
+
+        /* Screens Layout */
+        .screen { display: none; padding: 12px 16px; }
+        .screen.active { display: block; }
+
+        /* Hero Banner */
+        .hero-banner { background: linear-gradient(135deg, #240c54, #0f0529); padding: 20px; border-radius: 16px; margin-bottom: 15px; border: 1px solid #2d186b; }
+        .hero-banner h2 { font-size: 22px; line-height: 1.2; }
+        .highlight { color: #f59e0b; }
+        .hero-banner p { color: #9ca3af; font-size: 12px; margin: 8px 0 15px 0; }
+        .auth-btns { display: flex; gap: 10px; }
+        .btn { flex: 1; padding: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 14px; }
+        .btn-purple { background: #6d28d9; color: white; }
+        .btn-yellow { background: #f59e0b; color: black; }
+
+        /* Section Title */
+        .section-title { font-size: 15px; font-weight: bold; margin: 15px 0 10px 0; display: flex; justify-content: space-between; align-items: center; }
+        .view-all { font-size: 12px; color: #9ca3af; cursor: pointer; }
+
+        /* Quick Actions */
+        .quick-actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px; }
+        .action-item { background: #150d33; padding: 10px 4px; border-radius: 12px; text-align: center; font-size: 11px; cursor: pointer; border: 1px solid #23144f; }
+        .action-icon { width: 38px; height: 38px; border-radius: 10px; margin: 0 auto 6px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+
+        /* Colors */
+        .bg-purple { background: #6d28d9; }
+        .bg-green { background: #059669; }
+        .bg-blue { background: #2563eb; }
+        .bg-orange { background: #ea580c; }
+        .bg-red { background: #dc2626; }
+        .bg-teal { background: #0d9488; }
+        .bg-pink { background: #db2777; }
+
+        /* Cards & Lists */
+        .list-container { display: flex; flex-direction: column; gap: 8px; }
+        .list-card { background: #120a2e; padding: 12px; border-radius: 12px; border: 1px solid #221252; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .card-info { display: flex; gap: 12px; align-items: center; }
+        .card-img { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink:0; }
+        .card-text h4 { font-size: 14px; margin-bottom: 2px; }
+        .card-text p { font-size: 11px; color: #9ca3af; }
+        .coin-reward { color: #f59e0b; font-weight: bold; font-size: 13px; }
+        .card-right { display: flex; align-items: center; gap: 10px; }
+        .btn-action { border: none; padding: 6px 14px; border-radius: 6px; font-weight: bold; font-size: 12px; cursor: pointer; color: white; }
+
+        /* Screen Banners & Pills */
+        .screen-header-banner { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .banner-icon { font-size: 40px; }
+        .filter-pills { display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 4px; }
+        .pill { background: #150d33; border: 1px solid #28175b; color: #9ca3af; padding: 6px 14px; border-radius: 20px; font-size: 12px; cursor: pointer; white-space: nowrap; }
+        .pill.active { background: #6d28d9; color: white; border-color: #6d28d9; }
+
+        /* Light Theme Container for Games & Wallet */
+        .bg-white-card { background: #fdfdfd; padding: 12px; border-radius: 16px; gap: 10px; }
+        .list-card-light { background: #f3f4f6; color: #111827; padding: 10px 12px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .list-card-light .card-text p { color: #6b7280; }
+
+        /* Task Details Screen */
+        .detail-card-main { background: #120a2e; border: 1px solid #27145e; border-radius: 14px; padding: 16px; margin-bottom: 15px; }
+        .detail-header-info { display: flex; align-items: center; gap: 12px; position: relative; }
+        .large-icon { width: 50px; height: 50px; font-size: 26px; }
+        .detail-reward-badge { position: absolute; right: 0; color: #f59e0b; font-size: 20px; font-weight: bold; }
+        .detail-section { background: #120a2e; border: 1px solid #27145e; border-radius: 14px; padding: 16px; margin-bottom: 15px; }
+        .detail-section h4 { margin-bottom: 12px; font-size: 14px; color: #e5e7eb; }
+        .step-item { display: flex; align-items: center; gap: 10px; font-size: 13px; margin-bottom: 10px; color: #d1d5db; }
+        .step-num { background: #2a1563; color: #8b5cf6; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; }
+        .bullet-list { margin-left: 18px; font-size: 12px; color: #9ca3af; line-height: 1.8; }
+        .btn-large-purple { width: 100%; background: #5b21b6; color: white; padding: 14px; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+
+        /* Wallet Screen */
+        .wallet-balance-card { background: linear-gradient(135deg, #4c1d95, #1e1b4b); padding: 16px; border-radius: 14px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .sub-label { font-size: 11px; color: #c084fc; }
+        .big-balance { font-size: 24px; font-weight: bold; margin-top: 2px; }
+        .btn-trans-history { background: rgba(0,0,0,0.3); color: white; border: none; padding: 8px 12px; border-radius: 8px; font-size: 11px; cursor: pointer; }
+        .pay-logo { font-weight: 900; font-style: italic; font-size: 16px; width: 45px; text-align: center; color: #000; }
+        .blue-text { color: #00baf2; }
+        .darkblue-text { color: #003087; }
+        .play-logo { color: #ea4335; font-style: normal; font-size: 20px; }
+
+        /* Bottom Nav */
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; max-width: 480px; background: #0b061c; border-top: 1px solid #1a0f3d; display: flex; justify-around; padding: 8px 0; z-index: 100; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: #6b7280; font-size: 10px; cursor: pointer; gap: 3px; }
+        .nav-item.active { color: #a855f7; }
+        .nav-icon { font-size: 18px; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- HEADER -->
+        <header>
+            <div class="header-left">
+                <span class="back-btn" id="backBtn" onclick="goBack()">←</span>
+                <span class="menu-btn" id="menuBtn">☰</span>
+                <div class="logo">KAMA<span>OX</span></div>
+            </div>
+            <div class="header-right">
+                <div class="coin-badge">
+                    <div class="coin-icon">💰</div>
+                    <span id="coinBalance">3402</span> Coins
+                </div>
+            </div>
+        </header>
+
+        <!-- 1. HOME SCREEN -->
+        <div id="screen-home" class="screen active">
+            <div class="hero-banner">
+                <div class="hero-text">
+                    <h2>Play Games,<br><span class="highlight">Earn Cash</span></h2>
+                    <p>Play games, complete tasks and earn rewards</p>
+                    <div class="auth-btns">
+                        <button class="btn btn-purple">Login</button>
+                        <button class="btn btn-yellow">Register</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-title">Quick Actions</div>
+            <div class="quick-actions">
+                <div class="action-item" onclick="showScreen('games')">
+                    <div class="action-icon bg-purple">🎮</div>
+                    <span>Play Games</span>
+                </div>
+                <div class="action-item" onclick="showScreen('tasks')">
+                    <div class="action-icon bg-green">📋</div>
+                    <span>Earn Tasks</span>
+                </div>
+                <div class="action-item" onclick="alert('Referral Code: KAMA123 copied!')">
+                    <div class="action-icon bg-blue">🏆</div>
+                    <span>Invite</span>
+                </div>
+                <div class="action-item" onclick="showScreen('wallet')">
+                    <div class="action-icon bg-orange">💼</div>
+                    <span>Wallet</span>
+                </div>
+            </div>
+
+            <div class="section-title">
+                <span>Latest Tasks</span>
+                <span class="view-all" onclick="showScreen('tasks')">View all</span>
+            </div>
+            <div class="list-container">
+                <div class="list-card" onclick="openTaskDetail('Install App', 'Install and open the app', 300)">
+                    <div class="card-info">
+                        <div class="card-img bg-purple">📱</div>
+                        <div class="card-text">
+                            <h4>Install App</h4>
+                            <p>Install and open the app</p>
+                        </div>
+                    </div>
+                    <div class="coin-reward">+300 <span class="coin-sm">🪙</span></div>
+                </div>
+                <div class="list-card" onclick="openTaskDetail('Watch Video', 'Watch video for 30 sec', 150)">
+                    <div class="card-info">
+                        <div class="card-img bg-red">📺</div>
+                        <div class="card-text">
+                            <h4>Watch Video</h4>
+                            <p>Watch video for 30 sec</p>
+                        </div>
+                    </div>
+                    <div class="coin-reward">+150 <span class="coin-sm">🪙</span></div>
+                </div>
+                <div class="list-card" onclick="openTaskDetail('Survey', 'Complete survey and earn', 200)">
+                    <div class="card-info">
+                        <div class="card-img bg-teal">📝</div>
+                        <div class="card-text">
+                            <h4>Survey</h4>
+                            <p>Complete survey and earn</p>
+                        </div>
+                    </div>
+                    <div class="coin-reward">+200 <span class="coin-sm">🪙</span></div>
+                </div>
+                <div class="list-card">
+                    <div class="card-info">
+                        <div class="card-img bg-blue">🎡</div>
+                        <div class="card-text">
+                            <h4>Spin Wheel</h4>
+                            <p>Spin and win rewards</p>
+                        </div>
+                    </div>
+                    <div class="coin-reward">+100 <span class="coin-sm">🪙</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. EARN TASK SCREEN -->
+        <div id="screen-tasks" class="screen">
+            <div class="screen-header-banner">
+                <div>
+                    <h2>Earn Tasks</h2>
+                    <p>Complete tasks and earn unlimited coins</p>
+                </div>
+                <div class="banner-icon">📋</div>
+            </div>
+
+            <div class="filter-pills">
+                <button class="pill active">All Tasks</button>
+                <button class="pill">Featured</button>
+                <button class="pill">Easy</button>
+                <button class="pill">Survey</button>
+            </div>
+
+            <div class="list-container">
+                <div class="list-card">
+                    <div class="card-info">
+                        <div class="card-img bg-orange">📱</div>
+                        <div class="card-text">
+                            <h4>Install App</h4>
+                            <p>Install and open the app</p>
+                        </div>
+                    </div>
+                    <div class="card-right">
+                        <span class="coin-reward">+300 🪙</span>
+                        <button class="btn-action btn-purple" onclick="openTaskDetail('Install App', 'Install and open the app', 300)">Go</button>
+                    </div>
+                </div>
+                <div class="list-card">
+                    <div class="card-info">
+                        <div class="card-img bg-orange">📺</div>
+                        <div class="card-text">
+                            <h4>Watch Video</h4>
+                            <p>Watch video for 30 sec</p>
+                        </div>
+                    </div>
+                    <div class="card-right">
+                        <span class="coin-reward">+150 🪙</span>
+                        <button class="btn-action btn-purple" onclick="claimCoins(150)">Watch</button>
+                    </div>
+                </div>
+                <div class="list-card">
+                    <div class="card-info">
+                        <div class="card-img bg-green">📝</div>
+                        <div class="card-text">
+                            <h4>Survey</h4>
+                            <p>Complete survey & earn</p>
+                        </div>
+                    </div>
+                    <div class="card-right">
+                        <span class="coin-reward">+200 🪙</span>
+                        <button class="btn-action btn-purple" onclick="claimCoins(200)">Go</button>
+                    </div>
+                </div>
+                <div class="list-card">
+                    <div class="card-info">
+                        <div class="card-img bg-teal">💬</div>
+                        <div class="card-text">
+                            <h4>Join WhatsApp</h4>
+                            <p>Join our WhatsApp group</p>
+                        </div>
+                    </div>
+                    <div class="card-right">
+                        <span class="coin-reward">+100 🪙</span>
+                        <button class="btn-action btn-purple" onclick="claimCoins(100)">Join</button>
+                    </div>
+                </div>
+                <div class="list-card">
+                    <div class="card-info">
+                        <div class="card-img bg-green">✅</div>
+                        <div class="card-text">
+                            <h4>Daily Check-in</h4>
+                            <p>Check-in daily and earn</p>
+                        </div>
+                    </div>
+                    <div class="card-right">
+                        <span class="coin-reward">+50 🪙</span>
+                        <button class="btn-action btn-green" onclick="claimCoins(50)">Claim</button>
+                    </div>
+                </div>
+                <div class="list-card">
+                    <div class="card-info">
+                        <div class="card-img bg-pink">👥</div>
+                        <div class="card-text">
+                            <h4>Refer & Earn</h4>
+                            <p>Invite friends and earn</p>
+                        </div>
+                    </div>
+                    <div class="card-right">
+                        <span class="coin-reward">+500 🪙</span>
+                        <button class="btn-action btn-purple" onclick="alert('Referral link copied!')">Invite</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. TASK DETAIL SCREEN -->
+        <div id="screen-task-detail" class="screen">
+            <div class="detail-card-main">
+                <div class="detail-header-info">
+                    <div class="card-img bg-purple large-icon">📱</div>
+                    <div>
+                        <h3 id="taskTitle">Install App</h3>
+                        <p id="taskSub">Install and open the app</p>
+                    </div>
+                    <div class="detail-reward-badge" id="taskReward">+300</div>
+                </div>
+            </div>
+
+            <div class="detail-section">
+                <h4>Steps to Complete</h4>
+                <div class="step-item"><span class="step-num">1</span> Click on 'Go' button</div>
+                <div class="step-item"><span class="step-num">2</span> Install the app from Play Store</div>
+                <div class="step-item"><span class="step-num">3</span> Open the app and explore</div>
+                <div class="step-item"><span class="step-num">4</span> Come back and claim your reward</div>
+            </div>
+
+            <div class="detail-section">
+                <h4>Important</h4>
+                <ul class="bullet-list">
+                    <li>Do not uninstall before claiming coins</li>
+                    <li>Complete all steps to get rewards</li>
+                    <li>It may take few minutes to reflect the coins.</li>
+                </ul>
+            </div>
+
+            <button class="btn-large-purple" onclick="completeTaskAction()">Go to Play Store</button>
+        </div>
+
+        <!-- 4. PLAY GAMES SCREEN -->
+        <div id="screen-games" class="screen">
+            <div class="screen-header-banner">
+                <div>
+                    <h2>Play Games</h2>
+                    <p>Play fun games and earn coins</p>
+                </div>
+                <div class="banner-icon">🎮</div>
+            </div>
+
+            <div class="filter-pills">
+                <button class="pill active">All Games</button>
+                <button class="pill">Puzzle</button>
+                <button class="pill">Arcade</button>
+                <button class="pill">Strategy</button>
+            </div>
+
+            <div class="list-container bg-white-card">
+                <div class="list-card-light">
+                    <div class="card-info">
+                        <div class="card-img bg-blue">🎯</div>
+                        <div class="card-text">
+                            <h4>Bubble Shooter</h4>
+                            <p>Pop bubbles and win</p>
+                        </div>
+                    </div>
+                    <div class="card-right">
+                        <span class="coin-reward">+250 🪙</span>
+                        <button class="btn-action btn-purple" onclick="claimCoins(250)">Play</button>
+                    </div>
+                </div>
+                <div class="list-card-light">
+                    <div class="card-info">
+                        <div class="card-img bg-orange">⚪</div>
+                        <div class="card-text">
+                            <h4>Carrom King</h4>
+                            <p>Play carrom and earn</p>
+                        </div>
+                    </div>
+                    <div class="card-right">
+                        <span class="coin-reward">+180 🪙</span>
+                        <button class="btn-action btn-purple" onclick="claimCoins(180)">Play</button>
+                    </div>
+                </div>
+                <div class="list-card-light">
+                    <div class="card-info">
+                        <div class="card-img bg-purple">🏰</div>
+                        <div class="card-text">
+                            <h4>Tower Rush</h4>
+                            <p>Defend and unlock</p>
+                        </div>
+                    </div>
+                    <div class="card-right">
+                        <span class="coin-reward">+200 🪙</span>
+                        <button class="btn-action btn-purple" onclick="claimCoins(200)">Play</button>
+                    </div>
+                </div>
+                <div class="list-card-light">
+                    <div class="card-info">
+                        <div class="card-img bg-red">🧱</div>
+                        <div class="card-text">
+                            <h4>Block Breaker</h4>
+                            <p>Break blocks and win</p>
+                        </div>
+                    </div>
+                    <div class="card-right">
+                        <span class="coin-reward">+150 🪙</span>
+                        <button class="btn-action btn-purple" onclick="claimCoins(150)">Play</button>
+                    </div>
+                </div>
+                <div class="list-card-light">
+                    <div class="card-info">
+                        <div class="card-img bg-green">🍉</div>
+                        <div class="card-text">
+                            <h4>Fruit Ninja</h4>
+                            <p>Slice fruits and earn</p>
+                        </div>
+                    </div>
+                    <div class="card-right">
+                        <span class="coin-reward">+100 🪙</span>
+                        <button class="btn-action btn-purple" onclick="claimCoins(100)">Play</button>
+                    </div>
+                </div>
+                <div class="list-card-light">
+                    <div class="card-info">
+                        <div class="card-img bg-teal">🍔</div>
+                        <div class="card-text">
+                            <h4>Quiz Food</h4>
+                            <p>Test your food knowledge</p>
+                        </div>
+                    </div>
+                    <div class="card-right">
+                        <span class="coin-reward">+80 🪙</span>
+                        <button class="btn-action btn-purple" onclick="claimCoins(80)">Play</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. WALLET SCREEN -->
+        <div id="screen-wallet" class="screen">
+            <h2>Wallet</h2>
+            <p style="color:#9ca3af; font-size:12px; margin-bottom:15px;">Manage your coins and cash</p>
+
+            <div class="wallet-balance-card">
+                <div>
+                    <span class="sub-label">Your Balance</span>
+                    <div class="big-balance"><span id="walletCoinVal">3402</span> <span class="coin-lg">🪙</span></div>
+                </div>
+                <button class="btn-trans-history">Transaction History</button>
+            </div>
+
+            <div class="section-title">Redeem Cash</div>
+            <div class="list-container bg-white-card">
+                <div class="list-card-light">
+                    <div class="card-info">
+                        <div class="pay-logo">UPI</div>
+                        <div class="card-text">
+                            <h4>Redeem to UPI</h4>
+                            <p>Min. 500 Coins</p>
+                        </div>
+                    </div>
+                    <button class="btn-action btn-green" onclick="redeemCoins(500, 'UPI')">Redeem</button>
+                </div>
+                <div class="list-card-light">
+                    <div class="card-info">
+                        <div class="pay-logo blue-text">Paytm</div>
+                        <div class="card-text">
+                            <h4>Redeem to Paytm</h4>
+                            <p>Min. 500 Coins</p>
+                        </div>
+                    </div>
+                    <button class="btn-action btn-green" onclick="redeemCoins(500, 'Paytm')">Redeem</button>
+                </div>
+                <div class="list-card-light">
+                    <div class="card-info">
+                        <div class="pay-logo darkblue-text">PayPal</div>
+                        <div class="card-text">
+                            <h4>Redeem to PayPal</h4>
+                            <p>Min. 500 Coins</p>
+                        </div>
+                    </div>
+                    <button class="btn-action btn-green" onclick="redeemCoins(500, 'PayPal')">Redeem</button>
+                </div>
+                <div class="list-card-light">
+                    <div class="card-info">
+                        <div class="pay-logo play-logo">▶</div>
+                        <div class="card-text">
+                            <h4>Google Play</h4>
+                            <p>Redeem to Gift Card<br>Min. 1000 Coins</p>
+                        </div>
+                    </div>
+                    <button class="btn-action btn-green" onclick="redeemCoins(1000, 'Google Play')">Redeem</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- BOTTOM NAVIGATION BAR -->
+        <div class="bottom-nav">
+            <div class="nav-item active" id="nav-home" onclick="showScreen('home')">
+                <div class="nav-icon">🏠</div>
+                <span>Home</span>
+            </div>
+            <div class="nav-item" id="nav-games" onclick="showScreen('games')">
+                <div class="nav-icon">🎮</div>
+                <span>Games</span>
+            </div>
+            <div class="nav-item" id="nav-tasks" onclick="showScreen('tasks')">
+                <div class="nav-icon">📋</div>
+                <span>Earn</span>
+            </div>
+            <div class="nav-item" id="nav-leaderboard" onclick="alert('Leaderboard coming soon!')">
+                <div class="nav-icon">🏆</div>
+                <span>Leaderboard</span>
+            </div>
+            <div class="nav-item" id="nav-wallet" onclick="showScreen('wallet')">
+                <div class="nav-icon">💼</div>
+                <span>Wallet</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let appState = {
+            balance: 3402,
+            currentScreen: 'home',
+            previousScreen: 'home',
+            selectedTask: { title: '', desc: '', reward: 0 }
+        };
+
+        function updateBalanceUI() {
+            document.getElementById('coinBalance').innerText = appState.balance.toLocaleString();
+            if (document.getElementById('walletCoinVal')) {
+                document.getElementById('walletCoinVal').innerText = appState.balance.toLocaleString();
+            }
+        }
+
+        function showScreen(screenId) {
+            appState.previousScreen = appState.currentScreen;
+            appState.currentScreen = screenId;
+
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+            const target = document.getElementById('screen-' + screenId);
+            if (target) target.classList.add('active');
+
+            const activeNav = document.getElementById('nav-' + screenId);
+            if (activeNav) activeNav.classList.add('active');
+
+            const backBtn = document.getElementById('backBtn');
+            const menuBtn = document.getElementById('menuBtn');
+
+            if (screenId === 'home') {
+                backBtn.style.display = 'none';
+                menuBtn.style.display = 'inline-block';
+            } else {
+                backBtn.style.display = 'inline-block';
+                menuBtn.style.display = 'none';
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function goBack() {
+            showScreen('home');
+        }
+
+        function openTaskDetail(title, desc, reward) {
+            appState.selectedTask = { title, desc, reward };
+            document.getElementById('taskTitle').innerText = title;
+            document.getElementById('taskSub').innerText = desc;
+            document.getElementById('taskReward').innerText = '+' + reward;
+            showScreen('task-detail');
+        }
+
+        function completeTaskAction() {
+            claimCoins(appState.selectedTask.reward);
+            showScreen('tasks');
+        }
+
+        function claimCoins(amount) {
+            appState.balance += amount;
+            updateBalanceUI();
+            alert('Congratulations! +' + amount + ' Coins added to your account.');
+        }
+
+        function redeemCoins(minAmount, provider) {
+            if (appState.balance >= minAmount) {
+                appState.balance -= minAmount;
+                updateBalanceUI();
+                alert('Redeem request submitted successfully via ' + provider + '!');
+            } else {
+                alert('Insufficient balance! You need at least ' + minAmount + ' coins.');
+            }
+        }
+    </script>
+</body>
+</html>
